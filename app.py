@@ -147,4 +147,11 @@ elif st.session_state.stage == "results":
 
         # Trial-level table & download
         st.write("### Trial Data")
-        st.dataframe(d
+        st.dataframe(df)
+        csv = df.to_csv(index=False).encode("utf-8")
+        st.download_button("Download Results CSV", data=csv, file_name="stroop_results.csv", mime="text/csv")
+
+    if st.button("Restart Test"):
+        for k in list(st.session_state.keys()):
+            del st.session_state[k]
+        st.rerun()
