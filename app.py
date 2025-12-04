@@ -74,7 +74,7 @@ if st.session_state.stage == "instructions":
 
     # ---------------- Age input ----------------
     age_input = st.number_input(
-        "Enter your age (years):", min_value=10, max_value=120, value=30, step=1
+        "Enter your age (years):", min_value=10, max_value=120, step=1
     )
     st.session_state.user_age = age_input
 
@@ -93,7 +93,7 @@ elif st.session_state.stage == "test":
         st.rerun()
     else:
         trial = st.session_state.trials[idx]
-        st.write(f"Trial {idx+1} / {NUM_QUESTIONS}")
+        st.write(f"Test {idx+1} / {NUM_QUESTIONS}")
         show_stimulus(trial)
 
         if st.session_state.start_time is None:
@@ -146,7 +146,7 @@ elif st.session_state.stage == "results":
             st.success("✅ Low probability of dementia")
 
         # Trial-level table & download
-        st.write("### Trial Data")
+        st.write("### Test Data")
         st.dataframe(df)
         csv = df.to_csv(index=False).encode("utf-8")
         st.download_button("Download Results CSV", data=csv, file_name="stroop_results.csv", mime="text/csv")
@@ -155,3 +155,4 @@ elif st.session_state.stage == "results":
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
+
