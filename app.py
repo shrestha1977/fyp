@@ -1,68 +1,73 @@
 import streamlit as st
 import random
 import time
-import pandas as pd
-import pickle
 import numpy as np
+import pickle
 
-# Load ML model and scaler
+# --- Load trained ML model and scaler ---
 model = pickle.load(open("dementia_model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
 
-# --- STROOP TEST WORDS ---
+# --- Stroop Test Setup ---
 colors = ["RED", "BLUE", "GREEN", "YELLOW", "PURPLE"]
 actual_colors = ["red", "blue", "green", "yellow", "purple"]
 
-def run_stroop_test(num_questions=10):
+def run_stroop_test(num_questions=5):
     st.write("### Stroop Test")
+    
+    # Initialize session state variables
+    if "question_index" not in st.session_state:
+        st.session_state.question_index = 0
+        st.session_state.correct = 0
+        st.session_state.wrong = 0
+        st.session_state.reaction_times = []
+        st.session_state.current_word = random.choice(colors)
+        st.session_state.current_color = random.choice(actual_colors)
+        st.session_state.start_time = time.time()
+        st.session_state.finished = False
+    
+    if st.session_state.finished:
+        avg_rt = np.mean(st.session_state.reaction_times)
+        stroop_score = st.session_state.correct*4 - st.session_state.wrong*2
+        return avg_rt, st.session_state.correct, st.session_state.wrong, stroop_score
 
-    correct = 0
-    wrong = 0
-    reaction_times = []
+    st.write(f"**Question {st.session_state.question_index+1}/{num_questions}**")
+    st.write(f"Word: **{st.session_state.current_word}**")
 
-    start_button = st.button("Start Test")
+    user_answer = st.radio("Choose the COLOR of the word:", actual_colors, key="answer")
+    submit = st.button("Submit Answer")
 
-    if start_button:
-        st.write("**The test has started! Identify the COLOR of the word (not the word itself).**")
-        st.write("---")
+    if submit:
+        reaction_time = time.time() - st.session_state.start_time
+        st.session_state.reaction_times.append(reaction_time)
 
-        for i in range(num_questions):
-            word = random.choice(colors)
-            color = random.choice(actual_colors)
+        if user_answer == st.session_state.current_color:
+            st.session_state.correct += 1
+        else:
+            st.session_state.wrong += 1
 
-            st.write(f"### Word: **: {word}**")
-            st.write(f"### Color shown: (the text will appear in {color})")
+        st.session_state.question_index += 1
 
-            start_time = time.time()
-            user_answer = st.radio(
-                "Choose the color:",
-                actual_colors,
-                key=f"q{i}"
-            )
-            confirm = st.button(f"Submit Q{i}")
-
-            if confirm:
-                end_time = time.time()
-                reaction_time = end_time - start_time
-                reaction_times.append(reaction_time)
-
-                if user_answer == color:
-                    correct += 1
-                else:
-                    wrong += 1
-
-                st.write("---")
-
-        avg_rt = sum(reaction_times) / len(reaction_times)
-        stroop_score = correct * 4 - wrong * 2
-
-        return avg_rt, correct, wrong, stroop_score
+        if st.session_state.question_index < num_questions:
+            st.session_state.current_word = random.choice(colors)
+            st.session_state.current_color = random.choice(actual_colors)
+            st.session_state.start_time = time.time()
+        else:
+            st.session_state.finished = True
+            avg_rt = np.mean(st.session_state.reaction_times)
+            stroop_score = st.session_state.correct*4 - st.session_state.wrong*2
+            return avg_rt, st.session_state.correct, st.session_state.wrong, stroop_score
 
     return None
 
-# ----------- STREAMLIT UI ---------------
-st.title("🧠 Dementia Detection Using Stroop Test (ML Powered)")
-st.write("This website uses a trained ML model + Stroop Test performance to estimate early dementia risk.")
+# --- Streamlit App UI ---
+st.set_page_config(page_title="Dementia Detection", page_icon="🧠", layout="centered")
+
+st.title("🧠 Dementia Detection Using Stroop Test")
+st.write("""
+This website uses a trained Machine Learning model + Stroop Test performance 
+to estimate early dementia risk.
+""")
 
 age = st.number_input("Enter your age", 40, 90)
 
@@ -89,3 +94,5 @@ if result:
         st.error("⚠ High probability of Cognitive Impairment / Dementia")
     else:
         st.success("✅ Low probability of Dementia")
+
+    st.write("**Disclaimer:** This is for educational purposes and not a medical diagnosis.")
