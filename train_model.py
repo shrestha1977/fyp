@@ -1,4 +1,4 @@
-# retrain_dementia_model.py
+
 
 import pandas as pd
 import numpy as np
@@ -46,3 +46,4 @@ print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
 # ---------------- Step 7: Save Model ----------------
 pickle.dump(model, open("dementia_model.pkl", "wb"))
 print("Model saved as dementia_model.pkl")
+
