@@ -1,1 +1,1 @@
-# Stroop-Test-for-detection-of-Cognitive-Decline
+# Stroop Test for detection of Cognitive-Decline
