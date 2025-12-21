@@ -139,11 +139,12 @@ elif st.session_state.stage == "results":
         pred = model.predict(user_scaled)[0]
 
         st.write("---")
-        st.write("## Dementia Risk Result")
+        st.write("## Cognitive Decline Risk Result")
         if pred == 1:
-            st.error("⚠ High risk of Cognitive Decline")
+            st.error("🔴 Red Zone – High risk of Cognitive Decline")
         else:
-            st.success("✅ Low risk of Cognitive Decline")
+            st.success("🟢 Green Zone - Low risk of Cognitive Decline")
+        st.caption("⚠ This result is based on a screening test and is not a medical diagnosis.")
 
         # Trial-level table & download
         st.write("### Test Data")
@@ -155,5 +156,6 @@ elif st.session_state.stage == "results":
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
+
 
 
