@@ -69,7 +69,6 @@ if st.session_state.stage == "instructions":
         - You will see a color word displayed in colored ink.
         - Select the **color of the ink**, not the text.
         - Try to respond quickly and accurately.
-        - After practice, the test block will start.
     """)
 
     # ---------------- Age input ----------------
@@ -156,6 +155,7 @@ elif st.session_state.stage == "results":
         for k in list(st.session_state.keys()):
             del st.session_state[k]
         st.rerun()
+
 
 
 
